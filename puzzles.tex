@@ -1,0 +1,63 @@
+\documentclass{article}
+
+\usepackage{enumitem}
+\usepackage[margin=1in]{geometry}
+\usepackage{microtype}
+\usepackage{multicol}
+
+\usepackage{marchingbands}
+
+\setlist[enumerate,itemize]{leftmargin=*}
+\setlist*[itemize]{noitemsep}
+\setlist*[enumerate]{labelindent=6pt}
+
+\pagestyle{empty}
+
+% Usage: \puzzle{title}{clues for rows}{clues for bands}{solution}
+\newcommand\puzzle[4]{%
+  {\center\large\bfseries {#1}\endcenter}
+  {\centering\marchingbands[0.75]\par\bigskip}
+  \formatclues{#2}{#3}%
+  \clearpage
+  {\center\large\bfseries Solution to {#1}\endcenter}
+  {\centering\marchingbandspuzzle[0.75]#4\endmarchingbandspuzzle\par\bigskip}
+  \formatclues{#2}{#3}%
+  \clearpage
+}
+
+% Usage: \formatclues{clues for rows}{clues for bands}
+\newcommand\formatclues[2]{%
+  \columnsep=18pt
+  \begin{multicols}{3}%
+    \raggedright
+    \raggedcolumns
+    \parindent=0pt
+    \textbf{Rows}
+    {\small\enumerate[label=\arabic*.]#1\endenumerate}
+    \par\smallskip
+    \textbf{Bands}
+    {\small\enumerate[label=\Alph*.]#2\endenumerate}
+  \end{multicols}
+}
+
+% A ``fill in this blank'' marker in a clue.
+\newcommand\blank{\makebox[2em]{\hrulefill}}
+
+\begin{document}
+
+\input{data/puzzle01.tex}
+\input{data/puzzle02.tex}
+\input{data/puzzle03.tex}
+\input{data/puzzle04.tex}
+\input{data/puzzle05.tex}
+\input{data/puzzle06.tex}
+\input{data/puzzle07.tex}
+\input{data/puzzle08.tex}
+\input{data/puzzle09.tex}
+\input{data/puzzle10.tex}
+\input{data/puzzle11.tex}
+\input{data/puzzle12.tex}
+\input{data/puzzle13.tex}
+\input{data/puzzle14.tex}
+
+\end{document}

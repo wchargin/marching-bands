@@ -1,0 +1,105 @@
+\ProvidesPackage{marchingbands}
+%
+% This module exposes three members:
+%   - an environment marchingbandspuzzle,
+%   - a command \marchingbands, and
+%   - a command \puzzlerow for use within the environment.
+% Consult the documentation on each for more information.
+
+\RequirePackage{tikz}
+
+% This setting controls the number of bands in the grids that will be
+% drawn. This does not include the center black square. Thus, if there
+% are $n$ bands, then there are $2 n + 1$ total rows.
+\def\@bandcount{6}
+\pgfmathparse{int(2 * \@bandcount + 1)}\edef\@totalrows{\pgfmathresult}
+
+% Usage: \@numtoAlph{5} renders as E, the fifth letter of the alphabet.
+\def\@numtoAlph#1{\setcounter{mb@numtoAlph}{#1}\Alph{mb@numtoAlph}}
+\newcounter{mb@numtoAlph}
+
+% The marching bands puzzle environment typesets the grid of a marching
+% bands puzzle. Within the environment, the user can add to the TikZ
+% picture---for example, to fill in the grid with the correct solution.
+% The \puzzlerow command makes this easy. Here is the expected usage:
+%
+%   \begin{marchingbandspuzzle}[0.8]  % optional scale factor; defaults to 1.0
+%     \puzzlerow TEXTGOESHERE;
+%     \puzzlerow DOTS.R.BLANK;
+%     \puzzlerow ETCETCETCETC;
+%   \end{marchingbandspuzzle}
+%
+\newenvironment{marchingbandspuzzle}[1][1]{%
+  \begin{tikzpicture}[scale=#1]
+    \tikzset{
+      dark band/.style={fill=black!15!white},
+      light band/.style={fill=white},
+      center band/.style={fill=black},
+      puzzle cell/.style={font=\sffamily\large},
+      label/.style={opacity=0.7},
+      row label/.style={label},
+      band label/.style={label, font=\small},
+    }
+    %
+    \foreach \i
+    [
+      evaluate=\i as \min using \i - 1,
+      evaluate=\i as \max using \@totalrows + 1 - \i,
+      evaluate=\i as \parity using int(\i - 2 * int(\i / 2)),
+    ] in {1,...,\@bandcount} {%
+      \edef\bandtype{\if\parity0{dark band}\else{light band}\fi}
+      \fill [\bandtype] (\min, \min) rectangle (\max, \max);
+      \node [below right, band label] at (\min, \max) {\@numtoAlph{\i}};
+    }
+    \fill [center band] (\@bandcount, \@bandcount) rectangle ++ (1, 1);
+    %
+    \foreach \row in {1,...,\@totalrows}
+      \node [left=12pt, row label] at (0, \@totalrows + 0.5 - \row) {\row};
+    %
+    \draw [opacity=0.25] (0, 0) grid (\@totalrows, \@totalrows);
+    \draw [thick] (0, 0) rectangle (\@totalrows, \@totalrows);
+    %
+    % Initialize counters for \puzzlerow's use
+    \setcounter{mb@currentrow}{0}
+    \setcounter{mb@currentcol}{0}
+}{%
+  \end{tikzpicture}%
+}
+
+% A convenience command to draw an empty puzzle. This accepts the same
+% optional scale argument as the marchingbandspuzzle environment does,
+% but does not offer the option to add any content inside the grid.
+\newcommand\marchingbands[1][1]{%
+  \begin{marchingbandspuzzle}[#1]\end{marchingbandspuzzle}}
+
+% Usage:
+%
+%   \puzzlerow LETTERS;
+%   \puzzlerow MORE.LETTERS;
+%
+% (including the semicolons).
+% This should be used inside a TikZ picture (and probably inside the
+% marchingbandspuzzle environment). Each letter will be painted in a
+% separate cell, moving from left to right across each row and top to
+% bottom among rows. Using a period in place of a letter will cause a
+% cell to be skipped (which is useful to handle the center square).
+%
+\def\puzzlerow{%
+  \@ifnextchar;\@puzzlerowsemi{\@ifnextchar.\@puzzlerowdot\@puzzlerowchar}}
+\newcounter{mb@currentrow}
+\newcounter{mb@currentcol}
+\def\@puzzlerowsemi;{%
+  \stepcounter{mb@currentrow}%
+  \setcounter{mb@currentcol}{0}%
+}%
+\def\@puzzlerowdot.{%
+  % Dots are ignored, so that they can be used for the center square.
+  \stepcounter{mb@currentcol}%
+  \puzzlerow%
+}
+\def\@puzzlerowchar#1{%
+  \path (\value{mb@currentcol} + 0.5, \@totalrows - \value{mb@currentrow} - 0.5)
+    node [puzzle cell] {#1};%
+  \stepcounter{mb@currentcol}%
+  \puzzlerow%
+}
