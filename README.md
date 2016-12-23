@@ -6,6 +6,10 @@ code required to typeset them as worksheets and as solutions.
 
   [sample puzzle]: http://blogs.wsj.com/puzzle/2016/07/22/marching-bands-saturday-puzzle-14/
 
+## Example
+
+![A sample puzzle, as rendered by the code in this repository](https://cloud.githubusercontent.com/assets/4317806/21831520/3cbed7fa-d759-11e6-825d-29584374db96.png)
+
 ## Building
 
 Each `.tex` file in the top level directory is a build target. You can
